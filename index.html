@@ -16,6 +16,10 @@
     rel="stylesheet">
   <style>
     :root {
+      --gold: #c9a15b;
+      --gold-bright: #e8c589;
+      --gold-dim: rgba(201, 161, 91, 0.16);
+      --gold-glow: rgba(201, 161, 91, 0.45);
       --bg: #050607;
       --bg-alt: #0a0c0f;
       --surface: #0f1216;
@@ -236,7 +240,7 @@
       color: #04070a;
       background: var(--cyan);
       padding: 14px 26px;
-      border-radius: 999px;
+      border-radius: 5px;
       display: inline-flex;
       align-items: center;
       gap: 10px;
@@ -263,30 +267,510 @@
       border-color: var(--cyan);
     }
 
-    .hero-stats {
-      display: flex;
-      gap: 34px;
-      margin-top: 56px;
-      flex-wrap: wrap;
+    /* ---------- Hero mark (reticle + logo) ---------- */
+    .aperture-scene {
+      position: relative;
+      z-index: 1;
+      align-self: start;
+      transition: transform .4s ease-out;
+      will-change: transform;
     }
 
-    .hero-stats strong {
-      display: block;
+    .aperture-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Hide scrollbar for Chrome, Safari, Edge */
+    ::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
+
+    /* Hide scrollbar for Firefox */
+    html {
+      scrollbar-width: none;
+    }
+
+    /* Hide scrollbar for IE and older Edge */
+    body {
+      -ms-overflow-style: none;
+    }
+
+    #blades {
+      transform-origin: 150px 150px;
+      transform: rotate(-34deg) scale(0.78);
+      transition: transform 1.3s cubic-bezier(.16, .84, .44, 1);
+    }
+
+    .hero.loaded #blades {
+      transform: rotate(0deg) scale(1);
+    }
+
+    .blade {
+      fill: var(--surface-2);
+      stroke: var(--line-strong);
+      stroke-width: 1;
+    }
+
+    .ring {
+      fill: none;
+      stroke: var(--line-strong);
+      stroke-width: 1;
+      opacity: 0;
+      transition: opacity 1s ease .2s;
+    }
+
+    .hero.loaded .ring {
+      opacity: 1;
+    }
+
+    .glass-core {
+      opacity: 0;
+      transform: scale(0.3);
+      transform-origin: 150px 150px;
+      transition: transform 1s cubic-bezier(.16, .84, .44, 1) .3s, opacity 1s ease .3s;
+    }
+
+    .hero.loaded .glass-core {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .tick {
+      stroke: var(--gold);
+      stroke-width: 1;
+      opacity: 0.6;
+    }
+
+    .scan-ring {
+      position: absolute;
+      inset: 4%;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0deg, var(--cyan-glow) 8deg, transparent 42deg, transparent 360deg);
+      filter: blur(2px);
+      opacity: 0;
+      animation: spin 10s linear infinite;
+      transition: opacity 1.2s ease .4s;
+    }
+
+    .hero.loaded .scan-ring {
+      opacity: 0.7;
+    }
+
+    .reticle-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .ring-outer {
+      fill: none;
+      stroke: url(#ringGradient);
+      stroke-width: 0.75;
+      opacity: 0;
+      transition: opacity 1s ease .3s;
+    }
+
+    .hero.loaded .ring-outer {
+      opacity: 0.9;
+    }
+
+    .ring-mid {
+      fill: none;
+      stroke: var(--line-strong);
+      stroke-width: 0.5;
+      stroke-dasharray: 1 6;
+      opacity: 0;
+      transform-origin: 150px 150px;
+      animation: spin 50s linear infinite reverse;
+      transition: opacity 1s ease .45s;
+    }
+
+    .hero.loaded .ring-mid {
+      opacity: 0.55;
+    }
+
+    .ring-inner {
+      fill: none;
+      stroke: var(--cyan);
+      stroke-width: 0.75;
+      stroke-dasharray: 2 11;
+      opacity: 0;
+      transform-origin: 150px 150px;
+      animation: spin 30s linear infinite;
+      transition: opacity 1s ease .5s;
+    }
+
+    .hero.loaded .ring-inner {
+      opacity: 0.5;
+    }
+
+    /* .bracket {
+      fill: none;
+      stroke: var(--cyan);
+      stroke-width: 1.1;
+      stroke-linecap: round;
+      opacity: 0;
+      transition: opacity .6s ease .6s;
+    } */
+
+    /* .hero.loaded .bracket {
+      opacity: 0.8;
+    } */
+
+    .core-dot {
+      fill: var(--cyan);
+      opacity: 0;
+      transition: opacity 1s ease .7s;
+    }
+
+    .hero.loaded .core-dot {
+      opacity: 1;
+      animation: corePulse 2.8s ease-in-out infinite;
+    }
+
+    .core-halo {
+      fill: none;
+      stroke: var(--cyan);
+      stroke-width: 0.75;
+      opacity: 0;
+      transform-origin: 150px 150px;
+      transition: opacity 1s ease .7s;
+    }
+
+    .hero.loaded .core-halo {
+      opacity: 0.6;
+      animation: haloPulse 2.8s ease-in-out infinite;
+    }
+
+    @keyframes corePulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.35;
+      }
+    }
+
+    @keyframes haloPulse {
+      0% {
+        transform: scale(0.3);
+        opacity: 0.6;
+      }
+
+      100% {
+        transform: scale(2);
+        opacity: 0;
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .status-strip {
+      border-bottom: 1px solid var(--line);
+      background: var(--bg-alt);
+      position: relative;
+      z-index: 6;
+    }
+
+    .status-strip .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 28px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      gap: 16px;
+    }
+
+    .status-strip .status-live {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan-glow);
+      animation: pulse-dot 2.4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    .status-strip .status-loc {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.75);
+      }
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 28px;
+      max-width: var(--container);
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
       font-family: var(--font-display);
       font-weight: 700;
-      font-size: 20px;
-      color: var(--text);
+      font-size: 18px;
+      letter-spacing: 0.04em;
     }
 
-    .hero-stats span {
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 8px var(--cyan-glow));
+    }
+
+    .brand small {
+      display: block;
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      color: var(--text-faint);
+      margin-top: 4px;
+    }
+
+    .topbar-contact {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-muted);
+      border: 1px solid var(--line-strong);
+      padding: 9px 18px;
+      border-radius: 999px;
+      transition: border-color .25s ease, color .25s ease, background .25s ease, box-shadow .25s ease;
+    }
+
+    .topbar-contact:hover {
+      border-color: var(--cyan);
+      color: var(--text);
+      background: var(--cyan-dim);
+      box-shadow: 0 0 24px -10px var(--cyan-glow);
+    }
+
+    /* ---------- Field backgrounds (starfield + blueprint grid) ---------- */
+    .field {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .field-grid {
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 46px 46px;
+      -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 40%, transparent 85%);
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 40%, transparent 85%);
+    }
+
+    .field-stars {
+      background-image:
+        radial-gradient(1.6px 1.6px at 8% 22%, rgba(255, 255, 255, 0.55) 50%, transparent 51%),
+        radial-gradient(1.4px 1.4px at 22% 68%, rgba(255, 255, 255, 0.4) 50%, transparent 51%),
+        radial-gradient(1.8px 1.8px at 36% 12%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+        radial-gradient(1.3px 1.3px at 52% 78%, rgba(255, 255, 255, 0.35) 50%, transparent 51%),
+        radial-gradient(1.7px 1.7px at 67% 34%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+        radial-gradient(1.4px 1.4px at 81% 58%, rgba(255, 255, 255, 0.4) 50%, transparent 51%),
+        radial-gradient(1.9px 1.9px at 91% 20%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+        radial-gradient(1.3px 1.3px at 14% 88%, rgba(255, 255, 255, 0.35) 50%, transparent 51%),
+        radial-gradient(1.6px 1.6px at 46% 46%, rgba(255, 255, 255, 0.45) 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 74% 84%, rgba(255, 255, 255, 0.4) 50%, transparent 51%);
+      background-repeat: no-repeat;
+      animation: twinkle 6s ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+
+      0%,
+      100% {
+        opacity: 0.9;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      position: relative;
+      padding: 64px 0 128px;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -260px;
+      right: -220px;
+      width: 680px;
+      height: 680px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--cyan-dim) 0%, transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 28px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: center;
+      gap: 40px;
+      position: relative;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-copy .eyebrow {
+      margin-bottom: 22px;
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin-bottom: 30px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
       font-family: var(--font-mono);
       font-size: 11.5px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+      color: var(--cyan-soft);
+      border: 1px solid var(--cyan-dim);
+      background: var(--cyan-dim);
+      padding: 7px 14px 7px 10px;
+      border-radius: 999px;
+      margin-bottom: 30px;
+    }
+
+    .hero-cta {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      flex-wrap: wrap;
+    }
+
+    .link-secondary {
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--line-strong);
+      padding-bottom: 2px;
+      transition: color .25s ease, border-color .25s ease;
+    }
+
+    .link-secondary:hover {
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    .hero-stats {
+      display: flex;
+      margin-top: 58px;
+      border-top: 1px solid var(--line);
+      padding-top: 22px;
+    }
+
+    .hero-stats div {
+      padding-right: 34px;
+      margin-right: 34px;
+      border-right: 1px solid var(--line);
+    }
+
+    .hero-stats div:last-child {
+      border-right: none;
+      margin-right: 0;
+      padding-right: 0;
+    }
+
+    .hero-stats strong {
+      display: block;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 22px;
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+
+    .hero-stats span {
+      display: block;
+      margin-top: 6px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
       color: var(--text-faint);
     }
 
-    /* ---------- Hero mark (reticle + logo) ---------- */
+    /* ---------- Hero mark (animated aperture) ---------- */
     .aperture-scene {
       position: relative;
       z-index: 1;
@@ -305,71 +789,96 @@
       justify-content: center;
     }
 
-    .scan-ring {
-      position: absolute;
-      inset: 8%;
-      border-radius: 50%;
-      background: conic-gradient(from 0deg, transparent 0deg, var(--cyan-glow) 16deg, transparent 50deg, transparent 360deg);
-      filter: blur(3px);
-      opacity: 0;
-      animation: spin 7s linear infinite;
-      transition: opacity 1s ease .4s;
-    }
-
-    .hero.loaded .scan-ring {
-      opacity: 0.9;
-    }
-
-    .reticle-svg {
-      position: absolute;
-      inset: 0;
+    .hero-mark {
       width: 100%;
       height: 100%;
+      color: var(--cyan);
+      overflow: visible;
     }
 
-    .ring-outer {
+    .hero-mark .hm-outer {
       fill: none;
       stroke: var(--line-strong);
       stroke-width: 1;
     }
 
-    .ring-inner {
+    .hero-mark .hm-hex {
       fill: none;
-      stroke: var(--cyan);
+      stroke: currentColor;
+      stroke-width: 1;
+      opacity: 0;
+      transform-origin: 150px 150px;
+      animation: spin-slow 40s linear infinite;
+      transition: opacity 1s ease .35s;
+    }
+
+    .hero.loaded .hero-mark .hm-hex {
+      opacity: 0.5;
+    }
+
+    .hero-mark .hm-dash {
+      fill: none;
+      stroke: currentColor;
       stroke-width: 1;
       stroke-dasharray: 3 9;
       opacity: 0;
       transform-origin: 150px 150px;
-      animation: spin 30s linear infinite;
+      animation: spin 26s linear infinite;
       transition: opacity 1s ease .5s;
     }
 
-    .hero.loaded .ring-inner {
+    .hero.loaded .hero-mark .hm-dash {
       opacity: 0.55;
     }
 
-    .tick {
-      stroke: var(--cyan);
+    .hero-mark .hm-tick {
+      stroke: currentColor;
       stroke-width: 1.4;
       opacity: 0;
       transition: opacity .6s ease .6s;
     }
 
-    .hero.loaded .tick {
+    .hero.loaded .hero-mark .hm-tick {
       opacity: 0.7;
     }
 
-    .logo-mark {
-      position: relative;
-      width: 56%;
-      z-index: 2;
-      filter: drop-shadow(0 0 30px var(--cyan-glow));
+    .hero-mark .hm-scan {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-dasharray: 26 400;
       opacity: 0;
-      transform: scale(0.8);
-      transition: opacity 1s cubic-bezier(.16, .84, .44, 1) .15s, transform 1s cubic-bezier(.16, .84, .44, 1) .15s;
+      transform-origin: 150px 150px;
+      animation: spin 7s linear infinite;
+      transition: opacity 1s ease .4s;
+      filter: blur(0.5px);
     }
 
-    .hero.loaded .logo-mark {
+    .hero.loaded .hero-mark .hm-scan {
+      opacity: 0.85;
+    }
+
+    .hero-mark .hm-core-glow {
+      opacity: 0;
+      transition: opacity 1.1s ease .2s;
+    }
+
+    .hero-mark .hm-core-ring {
+      fill: #04070a;
+      stroke: #eaf9ff;
+      stroke-width: 2.2;
+      opacity: 0;
+      transform: scale(0.7);
+      transform-origin: 150px 150px;
+      transition: opacity 1s cubic-bezier(.16, .84, .44, 1) .15s, transform 1s cubic-bezier(.16, .84, .44, 1) .15s;
+      animation: core-pulse 3.2s ease-in-out 1.2s infinite;
+    }
+
+    .hero.loaded .hero-mark .hm-core-glow {
+      opacity: 1;
+    }
+
+    .hero.loaded .hero-mark .hm-core-ring {
       opacity: 1;
       transform: scale(1);
     }
@@ -380,10 +889,33 @@
       }
     }
 
+    @keyframes spin-slow {
+      to {
+        transform: rotate(-360deg);
+      }
+    }
+
+    @keyframes core-pulse {
+
+      0%,
+      100% {
+        stroke-width: 2.2;
+      }
+
+      50% {
+        stroke-width: 3.2;
+      }
+    }
+
     /* ---------- Sections (shared) ---------- */
     .section {
       padding: 104px 0;
       border-top: 1px solid var(--line);
+    }
+
+    .section-head {
+      max-width: 560px;
+      margin-bottom: 56px;
     }
 
     .section-head {
@@ -417,6 +949,42 @@
     .reveal.in-view {
       opacity: 1;
       transform: translateY(0);
+    }
+
+    /* ---------- Bracket-frame hover component (HUD corners) ---------- */
+    .bracket {
+      position: relative;
+    }
+
+    .bracket::before,
+    .bracket::after {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border: 1px solid transparent;
+      opacity: 0;
+      transition: opacity .3s ease;
+      pointer-events: none;
+    }
+
+    .bracket::before {
+      top: -1px;
+      left: -1px;
+      border-top-color: var(--cyan);
+      border-left-color: var(--cyan);
+    }
+
+    .bracket::after {
+      bottom: -1px;
+      right: -1px;
+      border-bottom-color: var(--cyan);
+      border-right-color: var(--cyan);
+    }
+
+    .bracket:hover::before,
+    .bracket:hover::after {
+      opacity: 0.85;
     }
 
     /* ---------- What we build ---------- */
@@ -766,9 +1334,10 @@
     <div class="hero-grid">
       <div class="hero-copy">
         <p class="eyebrow">Glazni Inc. — Russia · Germany · Europe</p>
-        <h1>Software that sees<br>every platform <em>clearly</em>.</h1>
-        <p class="hero-sub">Glazni is a software studio building fast, native-feeling apps — and the infrastructure
-          behind them — for clients across Russia, Germany and the rest of Europe.</p>
+        <h1>We make Premium,<br><em>Privacy-focused</em> Mobile applications</h1>
+        <p class="hero-sub">Glazni is a mobile-first software studio — building fast, native-feeling Android and iOS
+          apps, plus the websites, desktop tools, and infrastructure around them, for clients across Russia, Germany and
+          the rest of Europe.</p>
         <div class="hero-cta">
           <a class="btn-primary" href="mailto:hello@glazni.com?subject=Project%20inquiry">Start a project →</a>
           <a class="link-secondary" href="#stack">See our stack</a>
@@ -782,18 +1351,25 @@
 
       <div class="aperture-scene" id="apertureScene">
         <div class="aperture-wrap">
-          <div class="scan-ring" aria-hidden="true"></div>
-          <svg class="reticle-svg" viewBox="0 0 300 300" aria-hidden="true">
-            <circle class="ring-outer" cx="150" cy="150" r="144"></circle>
-            <circle class="ring-inner" cx="150" cy="150" r="120"></circle>
-            <line class="tick" x1="150" y1="2" x2="150" y2="18"></line>
-            <line class="tick" x1="150" y1="282" x2="150" y2="298"></line>
-            <line class="tick" x1="2" y1="150" x2="18" y2="150"></line>
-            <line class="tick" x1="282" y1="150" x2="298" y2="150"></line>
+          <svg class="hero-mark" viewBox="0 0 300 300" aria-hidden="true">
+            <defs>
+              <radialGradient id="hero-glow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#eaf9ff"></stop>
+                <stop offset="35%" stop-color="#29c1ff"></stop>
+                <stop offset="100%" stop-color="#29c1ff" stop-opacity="0"></stop>
+              </radialGradient>
+            </defs>
+            <circle class="hm-outer" cx="150" cy="150" r="144"></circle>
+            <polygon class="hm-hex" points="254,150 202,239.55 98,239.55 46,150 98,60.45 202,60.45"></polygon>
+            <circle class="hm-dash" cx="150" cy="150" r="118"></circle>
+            <circle class="hm-scan" cx="150" cy="150" r="144"></circle>
+            <line class="hm-tick" x1="150" y1="4" x2="150" y2="22"></line>
+            <line class="hm-tick" x1="150" y1="278" x2="150" y2="296"></line>
+            <line class="hm-tick" x1="4" y1="150" x2="22" y2="150"></line>
+            <line class="hm-tick" x1="278" y1="150" x2="296" y2="150"></line>
+            <circle class="hm-core-glow" cx="150" cy="150" r="46" fill="url(#hero-glow)"></circle>
+            <circle class="hm-core-ring" cx="150" cy="150" r="19"></circle>
           </svg>
-          <img class="logo-mark"
-            src="data:image/png;base64,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j46Ojr55HPMfNUp4DxvGcgMDy0gvKfc/7BnHr7uZPHny5Juh9ZQnq3Y6HK7qEyfElbo6Yf/6a7YwjGzCUEX5Raiqnq6T8vStj3l5eXmNHDlyZHx8fLzNZrMZ/XeMiYmJEUIIkxgeFWXo3+RKXZ3zr2vXuo789a/i2pUrbF94gpNCiN908TmLxWLJycnJWbVq1aqxY8eONXqEFBkUHm7UX8K1e+PGzpVxca69b75JgDBYtLW1tb333nvvxcXFxb3yyiuvGPX3iIq6eQFkEsN+/GPj1cfpdL7929+6dm/cyJbEYNXR0dHxzDPPPHPlypUrq1evXm208YeEhIQIIYQihgYFGW3wzu1/+AMBAm5as2bNmnu9jvNA5H2LIm3Gek8x1//t2eMq+OMf2XrAt55++umnS0tLS4027uDg4GBFWH18jHQMc239/e/ZcsD3ORwOx3PPPfec0cZts9lsijBbLIZp0OdHj7pqun7/ImAwKy4uLj537tw5I43ZYrFYFGHWNOMcxfbuZasBXdu9e/duI43XarVaFWEyToTExZtP/Qdwd1VVVVVGGq+u67piqHdZvXb5MtsM6FpDQ0ODkcYrpZSKoWa40+FgmwFdcziM93dEYdkAECEARAgAiBAAIgQARAgAEQIAIgSACAEAEQJAhACACAEgQgBAhAB4DBNTAHiOc+fOndu0adMmo4z3/Pnz54kQ4EGO3cJxDACIEAAiBABECAARAgAiBIAIAQARAkCEAIAIASBCAIgQUwCACAEgQgBAhAAQIQAgQgCIEAAQIQBECACIEAAiBABECAARAgAiBIAIAQARAkCEAIAIASBCAECEABAhACBCAIgQABAhAEQIAIgQACIEAEQIABECACIEgAgBABECQIQAECEAIEIAiBAAECEARAgAiBAAIgQARAgAEQIAIgSACAEAEQJAhACACAEgQgDQYyamAEaWnJycPH/+/PnMhDG988477xAhGNqkSZMmPfvss88yE8Z06NChQxzHAPQrIgSACAEgQgBAhAAQIQAgQgCIEAAQIQBECACIEAAiBABECAARAgAiBIAIAQARAkCEAIAIASBCAECEABAhACBCAIgQABAhAEQIAIgQACIEAEQIABECACIEgAgBABECQIQAECEAIEIAiBAAECEARAgAiBAAIgQARAiAhzMxBTCy/Pz8/F27du1iJm7Kzc3N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"
-            alt="Glazni logo mark">
         </div>
       </div>
     </div>
@@ -808,7 +1384,7 @@
       </div>
 
       <div class="build-grid">
-        <div class="build-card">
+        <div class="build-card bracket">
           <svg class="build-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6">
             <rect x="12" y="4" width="16" height="32" rx="3"></rect>
             <line x1="12" y1="30" x2="28" y2="30"></line>
@@ -819,7 +1395,7 @@
             earns its place.</p>
           <span class="build-tag">Primary focus</span>
         </div>
-        <div class="build-card">
+        <div class="build-card bracket">
           <svg class="build-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6">
             <rect x="4" y="8" width="32" height="24" rx="3"></rect>
             <line x1="4" y1="14" x2="36" y2="14"></line>
@@ -830,7 +1406,7 @@
           <p>Lean, server-rendered interfaces built with htmx and Node — fast to load, simple to maintain, no framework
             for its own sake.</p>
         </div>
-        <div class="build-card">
+        <div class="build-card bracket">
           <svg class="build-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6">
             <rect x="5" y="6" width="30" height="20" rx="2"></rect>
             <line x1="15" y1="32" x2="25" y2="32"></line>
@@ -853,18 +1429,18 @@
       </div>
 
       <div class="core-stack">
-        <div class="core-card">
+        <div class="core-card bracket">
           <span class="core-index">01 · CLIENT</span>
           <h3>Flutter</h3>
           <p>A single codebase for Android and iOS that still feels native on both — our default starting point for
             mobile work.</p>
         </div>
-        <div class="core-card">
+        <div class="core-card bracket">
           <span class="core-index">02 · SERVER</span>
           <h3>Golang</h3>
           <p>Typed, fast, boring in the best way — the backend language we reach for when a service has to stay up.</p>
         </div>
-        <div class="core-card">
+        <div class="core-card bracket">
           <span class="core-index">03 · INFRA</span>
           <h3>AWS</h3>
           <p>Infrastructure that scales with the client instead of ahead of them, provisioned and monitored as code.</p>
@@ -875,6 +1451,7 @@
         <div class="arsenal-group">
           <h4>Native &amp; mobile</h4>
           <div class="chip-row">
+            <span class="chip">Flutter</span>
             <span class="chip">Kotlin</span>
             <span class="chip">Swift</span>
           </div>
@@ -882,6 +1459,7 @@
         <div class="arsenal-group">
           <h4>Backend &amp; AI</h4>
           <div class="chip-row">
+            <span class="chip">Golang</span>
             <span class="chip">Node.js</span>
             <span class="chip">Java Spring Boot</span>
             <span class="chip">Langchain</span>
@@ -893,12 +1471,15 @@
             <span class="chip">PostgreSQL</span>
             <span class="chip">SQLite</span>
             <span class="chip">Firebase</span>
+            <span class="chip">Neo4j</span>
             <span class="chip">Metabase</span>
+            <span class="chip">Aparche Superset</span>
           </div>
         </div>
         <div class="arsenal-group">
           <h4>Cloud &amp; ops</h4>
           <div class="chip-row">
+            <span class="chip">AWS</span>
             <span class="chip">Google Cloud</span>
             <span class="chip">Kubernetes</span>
             <span class="chip">DevOps</span>
@@ -909,14 +1490,15 @@
           <div class="chip-row">
             <span class="chip">Prometheus</span>
             <span class="chip">Grafana</span>
-            <span class="chip">ELK Stack</span>
+            <span class="chip">EFK Stack</span>
             <span class="chip">Fluent Bit</span>
           </div>
         </div>
         <div class="arsenal-group">
           <h4>Web</h4>
           <div class="chip-row">
-            <span class="chip">htmx</span>
+            <span class="chip">HTMX</span>
+            <span class="chip">HTML + CSS + JS</span>
           </div>
         </div>
       </div>
@@ -932,7 +1514,7 @@
       </div>
 
       <div class="geo-grid">
-        <div class="geo-card">
+        <div class="geo-card bracket">
           <svg class="geo-reticle" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.3">
             <circle cx="15" cy="15" r="9"></circle>
             <line x1="15" y1="0" x2="15" y2="6"></line>
@@ -945,7 +1527,7 @@
           <div class="geo-coords">55.7558° N · 37.6173° E</div>
           <p class="geo-desc">Where Glazni started, and where most of the engineering team is based.</p>
         </div>
-        <div class="geo-card">
+        <div class="geo-card bracket">
           <svg class="geo-reticle" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.3">
             <circle cx="15" cy="15" r="9"></circle>
             <line x1="15" y1="0" x2="15" y2="6"></line>
@@ -958,7 +1540,7 @@
           <div class="geo-coords">52.5200° N · 13.4050° E</div>
           <p class="geo-desc">Our hub for European client work and on-the-ground meetings.</p>
         </div>
-        <div class="geo-card">
+        <div class="geo-card bracket">
           <svg class="geo-reticle" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.3">
             <circle cx="15" cy="15" r="9"></circle>
             <line x1="15" y1="0" x2="15" y2="6"></line>
