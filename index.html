@@ -1,34 +1,876 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simple Index</title>
-    <!-- Minimal style for basic readability -->
-    <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            max-width: 600px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            line-height: 1.6;
-            color: #222;
-        }
-        a {
-            color: #0066cc;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glazni — Software Studio</title>
+<meta name="description" content="Glazni Inc. builds cross-platform mobile apps, web apps, and infrastructure — for clients across Russia, Germany and Europe.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%2310151c' stroke='%23c9a15b' stroke-width='4'/%3E%3Ccircle cx='50' cy='50' r='16' fill='%236fd3c7'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f141b;
+    --bg-alt:#141b24;
+    --surface:#19212b;
+    --surface-2:#202a37;
+    --line: rgba(232,237,242,0.09);
+    --line-strong: rgba(232,237,242,0.16);
+    --text:#e9edf3;
+    --text-muted:#8b98a8;
+    --text-faint:#5c6878;
+    --glass:#6fd3c7;
+    --glass-dim: rgba(111,211,199,0.14);
+    --brass:#c9a15b;
+    --brass-dim: rgba(201,161,91,0.16);
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'IBM Plex Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --container: 1120px;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  img,svg{ display:block; max-width:100%; }
+  a{ color:inherit; text-decoration:none; }
+  ul{ list-style:none; }
+
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--glass);
+    outline-offset:3px;
+    border-radius:2px;
+  }
+
+  .wrap{
+    max-width:var(--container);
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--brass);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:16px; height:1px;
+    background:var(--brass);
+    display:inline-block;
+  }
+
+  h1,h2,h3{
+    font-family:var(--font-display);
+    font-weight:600;
+    letter-spacing:-0.01em;
+    color:var(--text);
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:relative;
+    z-index:5;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:26px 28px;
+    max-width:var(--container);
+    margin:0 auto;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:19px;
+    letter-spacing:0.01em;
+  }
+  .brand-mark{
+    width:26px; height:26px;
+    border-radius:50%;
+    border:1.5px solid var(--brass);
+    background:
+      radial-gradient(circle at 50% 50%, var(--glass) 0 28%, transparent 30%),
+      conic-gradient(from 0deg, var(--surface-2) 0 60deg, transparent 60deg 72deg,
+                      var(--surface-2) 72deg 132deg, transparent 132deg 144deg,
+                      var(--surface-2) 144deg 204deg, transparent 204deg 216deg,
+                      var(--surface-2) 216deg 276deg, transparent 276deg 288deg,
+                      var(--surface-2) 288deg 348deg, transparent 348deg 360deg);
+    flex-shrink:0;
+  }
+  .brand small{
+    display:block;
+    font-family:var(--font-mono);
+    font-weight:400;
+    font-size:9.5px;
+    letter-spacing:0.16em;
+    color:var(--text-faint);
+    margin-top:1px;
+  }
+  .topbar-contact{
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--text-muted);
+    border:1px solid var(--line-strong);
+    padding:8px 16px;
+    border-radius:999px;
+    transition:border-color .25s ease, color .25s ease, background .25s ease;
+  }
+  .topbar-contact:hover{
+    border-color:var(--glass);
+    color:var(--text);
+    background:var(--glass-dim);
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    padding:56px 0 120px;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute;
+    top:-220px; right:-220px;
+    width:640px; height:640px;
+    border-radius:50%;
+    background:radial-gradient(circle, var(--glass-dim) 0%, transparent 68%);
+    pointer-events:none;
+  }
+  .hero-grid{
+    max-width:var(--container);
+    margin:0 auto;
+    padding:0 28px;
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    align-items:center;
+    gap:40px;
+    position:relative;
+  }
+  .hero-copy{ position:relative; z-index:2; }
+  .hero-copy .eyebrow{ margin-bottom:22px; }
+  .hero h1{
+    font-size:clamp(34px, 4.6vw, 58px);
+    line-height:1.08;
+    margin-bottom:22px;
+  }
+  .hero h1 em{
+    font-style:normal;
+    color:var(--glass);
+  }
+  .hero-sub{
+    font-size:17px;
+    color:var(--text-muted);
+    max-width:480px;
+    margin-bottom:34px;
+  }
+  .hero-cta{
+    display:flex;
+    align-items:center;
+    gap:26px;
+    flex-wrap:wrap;
+  }
+  .btn-primary{
+    font-family:var(--font-mono);
+    font-size:13.5px;
+    letter-spacing:0.03em;
+    color:var(--bg);
+    background:var(--brass);
+    padding:14px 26px;
+    border-radius:999px;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    transition:transform .25s ease, box-shadow .25s ease, background .25s ease;
+    box-shadow:0 0 0 0 rgba(201,161,91,0.5);
+  }
+  .btn-primary:hover{
+    transform:translateY(-2px);
+    background:#dcb46e;
+    box-shadow:0 10px 30px -8px rgba(201,161,91,0.55);
+  }
+  .link-secondary{
+    font-family:var(--font-mono);
+    font-size:13.5px;
+    color:var(--text-muted);
+    border-bottom:1px solid var(--line-strong);
+    padding-bottom:2px;
+    transition:color .25s ease, border-color .25s ease;
+  }
+  .link-secondary:hover{ color:var(--glass); border-color:var(--glass); }
+
+  .hero-stats{
+    display:flex;
+    gap:34px;
+    margin-top:56px;
+    flex-wrap:wrap;
+  }
+  .hero-stats div{ }
+  .hero-stats strong{
+    display:block;
+    font-family:var(--font-display);
+    font-size:24px;
+    color:var(--text);
+  }
+  .hero-stats span{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+  }
+
+  /* ---------- Aperture ---------- */
+  .aperture-scene{
+    position:relative;
+    z-index:1;
+    transition:transform .4s ease-out;
+    will-change:transform;
+  }
+  .aperture-wrap{
+    position:relative;
+    width:100%;
+    max-width:440px;
+    margin:0 auto;
+    aspect-ratio:1/1;
+  }
+  #aperture{ width:100%; height:100%; overflow:visible; }
+  #blades{
+    transform-origin:150px 150px;
+    transform:rotate(-34deg) scale(0.78);
+    transition:transform 1.3s cubic-bezier(.16,.84,.44,1);
+  }
+  .hero.loaded #blades{ transform:rotate(0deg) scale(1); }
+  .blade{
+    fill:var(--surface-2);
+    stroke:var(--line-strong);
+    stroke-width:1;
+  }
+  .ring{
+    fill:none;
+    stroke:var(--line-strong);
+    stroke-width:1;
+  }
+  .glass-core{
+    opacity:0;
+    transform:scale(0.3);
+    transform-origin:150px 150px;
+    transition:transform 1s cubic-bezier(.16,.84,.44,1) .3s, opacity 1s ease .3s;
+  }
+  .hero.loaded .glass-core{ opacity:1; transform:scale(1); }
+  .tick{
+    stroke:var(--brass);
+    stroke-width:1;
+    opacity:0.55;
+  }
+
+  /* ---------- Sections (shared) ---------- */
+  .section{
+    padding:104px 0;
+    border-top:1px solid var(--line);
+  }
+  .section-head{
+    max-width:560px;
+    margin-bottom:56px;
+  }
+  .section-head .eyebrow{ margin-bottom:18px; }
+  .section-head h2{
+    font-size:clamp(26px, 3.2vw, 38px);
+    line-height:1.15;
+  }
+  .section-head p{
+    color:var(--text-muted);
+    margin-top:14px;
+    font-size:15.5px;
+    max-width:480px;
+  }
+
+  .reveal{
+    opacity:0;
+    transform:translateY(22px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .reveal.in-view{ opacity:1; transform:translateY(0); }
+
+  /* ---------- What we build ---------- */
+  .build-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+  }
+  .build-card{
+    background:var(--bg-alt);
+    padding:38px 32px;
+    transition:background .3s ease;
+  }
+  .build-card:hover{ background:var(--surface); }
+  .build-icon{
+    width:38px; height:38px;
+    margin-bottom:24px;
+    color:var(--glass);
+  }
+  .build-card h3{
+    font-size:19px;
+    margin-bottom:10px;
+  }
+  .build-card p{
+    color:var(--text-muted);
+    font-size:14.5px;
+  }
+  .build-tag{
+    display:inline-block;
+    margin-top:16px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--brass);
+    border:1px solid var(--brass-dim);
+    background:var(--brass-dim);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+
+  /* ---------- Stack ---------- */
+  .core-stack{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:18px;
+    margin-bottom:64px;
+  }
+  .core-card{
+    background:linear-gradient(160deg, var(--surface) 0%, var(--bg-alt) 100%);
+    border:1px solid var(--line-strong);
+    border-radius:16px;
+    padding:30px 26px;
+    position:relative;
+    overflow:hidden;
+  }
+  .core-card::after{
+    content:"";
+    position:absolute;
+    top:-60px; right:-60px;
+    width:140px; height:140px;
+    border-radius:50%;
+    background:radial-gradient(circle, var(--glass-dim), transparent 70%);
+  }
+  .core-index{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    color:var(--text-faint);
+    letter-spacing:0.08em;
+  }
+  .core-card h3{
+    font-size:24px;
+    margin:14px 0 10px;
+    position:relative;
+  }
+  .core-card p{
+    color:var(--text-muted);
+    font-size:14px;
+    position:relative;
+  }
+
+  .arsenal{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:28px 40px;
+  }
+  .arsenal-group h4{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    margin-bottom:12px;
+  }
+  .chip-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .chip{
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    color:var(--text-muted);
+    border:1px solid var(--line-strong);
+    padding:6px 12px;
+    border-radius:8px;
+    transition:border-color .25s ease, color .25s ease;
+  }
+  .chip:hover{ border-color:var(--glass); color:var(--text); }
+
+  /* ---------- Where we operate ---------- */
+  .geo-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:18px;
+  }
+  .geo-card{
+    border:1px solid var(--line-strong);
+    border-radius:14px;
+    padding:28px 26px;
+    background:var(--bg-alt);
+  }
+  .geo-reticle{
+    width:30px; height:30px;
+    margin-bottom:22px;
+    color:var(--brass);
+  }
+  .geo-city{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:18px;
+    margin-bottom:4px;
+  }
+  .geo-country{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin-bottom:16px;
+  }
+  .geo-coords{
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    color:var(--text-faint);
+    margin-bottom:14px;
+  }
+  .geo-desc{
+    color:var(--text-muted);
+    font-size:14px;
+  }
+
+  /* ---------- Contact ---------- */
+  .contact{
+    text-align:center;
+    padding:120px 0;
+  }
+  .contact .eyebrow{ justify-content:center; margin:0 auto 22px; }
+  .contact h2{
+    font-size:clamp(28px, 4vw, 44px);
+    max-width:640px;
+    margin:0 auto 30px;
+    line-height:1.2;
+  }
+  .contact-email{
+    display:inline-flex;
+    align-items:center;
+    gap:12px;
+    font-family:var(--font-mono);
+    font-size:clamp(18px, 2.6vw, 26px);
+    color:var(--text);
+    border-bottom:1px solid var(--brass);
+    padding-bottom:8px;
+    transition:color .25s ease, border-color .25s ease;
+  }
+  .contact-email:hover{ color:var(--glass); border-color:var(--glass); }
+  .contact-note{
+    margin-top:20px;
+    color:var(--text-faint);
+    font-size:13.5px;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:32px 0;
+  }
+  .footer-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .footer-brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    color:var(--text-faint);
+  }
+  .footer-mark{
+    width:16px; height:16px;
+    border-radius:50%;
+    border:1px solid var(--brass);
+  }
+  .footer-tag{
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    color:var(--text-faint);
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:880px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .aperture-wrap{ max-width:280px; margin-top:20px; }
+    .build-grid{ grid-template-columns:1fr; }
+    .core-stack{ grid-template-columns:1fr; }
+    .arsenal{ grid-template-columns:1fr; }
+    .geo-grid{ grid-template-columns:1fr; }
+    .hero-stats{ gap:26px; }
+  }
+  @media (max-width:520px){
+    .topbar{ padding:20px 20px; }
+    .hero{ padding:34px 0 80px; }
+    .section{ padding:76px 0; }
+    .contact{ padding:88px 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{
+      animation-duration:0.01ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:0.01ms !important;
+      scroll-behavior:auto !important;
+    }
+  }
+</style>
 </head>
 <body>
 
-    <h1>Hello, world.</h1>
-    <p>This is a new, simple index page.</p>
-    <p>Edit this file to build your project.</p>
-    <hr />
-    <footer>
-        <p><a href="#">Learn more</a> · <a href="#">Contact</a></p>
-        <p>&copy; 2026</p>
-    </footer>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>GLAZNI<small>SOFTWARE&nbsp;STUDIO</small></span>
+    </div>
+    <a class="topbar-contact" href="mailto:hello@glazni.dev">hello@glazni.dev</a>
+  </header>
+
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Glazni Inc. — Russia · Germany · Europe</p>
+        <h1>Software that sees<br>every platform <em>clearly</em>.</h1>
+        <p class="hero-sub">Glazni is a software studio building fast, native-feeling apps — and the infrastructure behind them — for clients across Russia, Germany and the rest of Europe.</p>
+        <div class="hero-cta">
+          <a class="btn-primary" href="mailto:hello@glazni.dev?subject=Project%20inquiry">Start a project →</a>
+          <a class="link-secondary" href="#stack">See our stack</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong>iOS · Android</strong><span>Primary focus</span></div>
+          <div><strong>Web · Linux · Windows</strong><span>Also shipped</span></div>
+          <div><strong>6+ yrs</strong><span>Building in production</span></div>
+        </div>
+      </div>
+
+      <div class="aperture-scene" id="apertureScene">
+        <div class="aperture-wrap">
+          <svg id="aperture" viewBox="0 0 300 300" role="img" aria-label="Glazni aperture mark">
+            <g id="blades"></g>
+            <circle class="ring" cx="150" cy="150" r="144"></circle>
+            <g class="glass-core">
+              <circle cx="150" cy="150" r="46" fill="url(#glassGrad)"></circle>
+              <circle cx="150" cy="150" r="46" fill="none" stroke="var(--brass)" stroke-width="1"></circle>
+              <line class="tick" x1="150" y1="86" x2="150" y2="100"></line>
+              <line class="tick" x1="150" y1="200" x2="150" y2="214"></line>
+              <line class="tick" x1="86" y1="150" x2="100" y2="150"></line>
+              <line class="tick" x1="200" y1="150" x2="214" y2="150"></line>
+            </g>
+            <defs>
+              <radialGradient id="glassGrad" cx="35%" cy="30%" r="75%">
+                <stop offset="0%" stop-color="#bff2ea"></stop>
+                <stop offset="55%" stop-color="#6fd3c7"></stop>
+                <stop offset="100%" stop-color="#2f6b64"></stop>
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">What we build</p>
+        <h2>One team, every screen.</h2>
+        <p>Mobile is where we're strongest — but the same discipline carries through to the web and the desktop.</p>
+      </div>
+
+      <div class="build-grid">
+        <div class="build-card">
+          <svg class="build-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="12" y="4" width="16" height="32" rx="3"></rect>
+            <line x1="12" y1="30" x2="28" y2="30"></line>
+            <circle cx="20" cy="33" r="1.3" fill="currentColor" stroke="none"></circle>
+          </svg>
+          <h3>Mobile apps</h3>
+          <p>Android and iOS from one Flutter codebase, with Kotlin and Swift written in wherever native performance earns its place.</p>
+          <span class="build-tag">Primary focus</span>
+        </div>
+        <div class="build-card">
+          <svg class="build-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="4" y="8" width="32" height="24" rx="3"></rect>
+            <line x1="4" y1="14" x2="36" y2="14"></line>
+            <circle cx="9" cy="11" r="0.8" fill="currentColor" stroke="none"></circle>
+            <circle cx="13" cy="11" r="0.8" fill="currentColor" stroke="none"></circle>
+          </svg>
+          <h3>Websites</h3>
+          <p>Lean, server-rendered interfaces built with htmx and Node — fast to load, simple to maintain, no framework for its own sake.</p>
+        </div>
+        <div class="build-card">
+          <svg class="build-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="5" y="6" width="30" height="20" rx="2"></rect>
+            <line x1="15" y1="32" x2="25" y2="32"></line>
+            <line x1="20" y1="26" x2="20" y2="32"></line>
+          </svg>
+          <h3>Desktop apps</h3>
+          <p>Linux and Windows builds for teams who need software that lives outside the browser.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal" id="stack">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">How we build it</p>
+        <h2>Three tools, most of the work.</h2>
+        <p>Everything else in the stack exists to support these three — the rest is chosen per project, not by default.</p>
+      </div>
+
+      <div class="core-stack">
+        <div class="core-card">
+          <span class="core-index">01 · CLIENT</span>
+          <h3>Flutter</h3>
+          <p>A single codebase for Android and iOS that still feels native on both — our default starting point for mobile work.</p>
+        </div>
+        <div class="core-card">
+          <span class="core-index">02 · SERVER</span>
+          <h3>Golang</h3>
+          <p>Typed, fast, boring in the best way — the backend language we reach for when a service has to stay up.</p>
+        </div>
+        <div class="core-card">
+          <span class="core-index">03 · INFRA</span>
+          <h3>AWS</h3>
+          <p>Infrastructure that scales with the client instead of ahead of them, provisioned and monitored as code.</p>
+        </div>
+      </div>
+
+      <div class="arsenal">
+        <div class="arsenal-group">
+          <h4>Native &amp; mobile</h4>
+          <div class="chip-row">
+            <span class="chip">Kotlin</span>
+            <span class="chip">Swift</span>
+          </div>
+        </div>
+        <div class="arsenal-group">
+          <h4>Backend &amp; AI</h4>
+          <div class="chip-row">
+            <span class="chip">Node.js</span>
+            <span class="chip">Java Spring Boot</span>
+            <span class="chip">Langchain</span>
+          </div>
+        </div>
+        <div class="arsenal-group">
+          <h4>Data</h4>
+          <div class="chip-row">
+            <span class="chip">PostgreSQL</span>
+            <span class="chip">SQLite</span>
+            <span class="chip">Firebase</span>
+            <span class="chip">Metabase</span>
+          </div>
+        </div>
+        <div class="arsenal-group">
+          <h4>Cloud &amp; ops</h4>
+          <div class="chip-row">
+            <span class="chip">Google Cloud</span>
+            <span class="chip">Kubernetes</span>
+            <span class="chip">DevOps</span>
+          </div>
+        </div>
+        <div class="arsenal-group">
+          <h4>Observability</h4>
+          <div class="chip-row">
+            <span class="chip">Prometheus</span>
+            <span class="chip">Grafana</span>
+            <span class="chip">ELK Stack</span>
+            <span class="chip">Fluent Bit</span>
+          </div>
+        </div>
+        <div class="arsenal-group">
+          <h4>Web</h4>
+          <div class="chip-row">
+            <span class="chip">htmx</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Where we operate</p>
+        <h2>Distributed by design.</h2>
+        <p>No single office to route everything through — just teams positioned where the clients are.</p>
+      </div>
+
+      <div class="geo-grid">
+        <div class="geo-card">
+          <svg class="geo-reticle" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.3">
+            <circle cx="15" cy="15" r="9"></circle>
+            <line x1="15" y1="0" x2="15" y2="6"></line>
+            <line x1="15" y1="24" x2="15" y2="30"></line>
+            <line x1="0" y1="15" x2="6" y2="15"></line>
+            <line x1="24" y1="15" x2="30" y2="15"></line>
+          </svg>
+          <div class="geo-city">Moscow</div>
+          <div class="geo-country">Russia</div>
+          <div class="geo-coords">55.7558° N · 37.6173° E</div>
+          <p class="geo-desc">Where Glazni started, and where most of the engineering team is based.</p>
+        </div>
+        <div class="geo-card">
+          <svg class="geo-reticle" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.3">
+            <circle cx="15" cy="15" r="9"></circle>
+            <line x1="15" y1="0" x2="15" y2="6"></line>
+            <line x1="15" y1="24" x2="15" y2="30"></line>
+            <line x1="0" y1="15" x2="6" y2="15"></line>
+            <line x1="24" y1="15" x2="30" y2="15"></line>
+          </svg>
+          <div class="geo-city">Berlin</div>
+          <div class="geo-country">Germany</div>
+          <div class="geo-coords">52.5200° N · 13.4050° E</div>
+          <p class="geo-desc">Our hub for European client work and on-the-ground meetings.</p>
+        </div>
+        <div class="geo-card">
+          <svg class="geo-reticle" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.3">
+            <circle cx="15" cy="15" r="9"></circle>
+            <line x1="15" y1="0" x2="15" y2="6"></line>
+            <line x1="15" y1="24" x2="15" y2="30"></line>
+            <line x1="0" y1="15" x2="6" y2="15"></line>
+            <line x1="24" y1="15" x2="30" y2="15"></line>
+          </svg>
+          <div class="geo-city">Europe-wide</div>
+          <div class="geo-country">Remote coverage</div>
+          <div class="geo-coords">CET / CEST time zones</div>
+          <p class="geo-desc">Remote-first delivery for clients anywhere else on the continent.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact reveal">
+    <div class="wrap">
+      <p class="eyebrow">Get in touch</p>
+      <h2>Tell us what you're building.</h2>
+      <a class="contact-email" href="mailto:hello@glazni.dev">
+        hello@glazni.dev
+      </a>
+      <p class="contact-note">We usually reply within a business day.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap footer-row">
+      <div class="footer-brand">
+        <span class="footer-mark" aria-hidden="true"></span>
+        <span>Glazni Inc.</span>
+      </div>
+      <span class="footer-tag">© 2026 · Software, in focus.</span>
+    </div>
+  </footer>
+
+<script>
+(function(){
+  // ---- Build the aperture blades ----
+  var svgNS = "http://www.w3.org/2000/svg";
+  var bladesGroup = document.getElementById('blades');
+  var cx = 150, cy = 150, R = 132, tipR = 152, bladeCount = 5, spread = 44;
+
+  for (var i = 0; i < bladeCount; i++) {
+    var baseAngle = (360 / bladeCount) * i - 90;
+    var a1 = (baseAngle - spread) * Math.PI / 180;
+    var a2 = (baseAngle + spread) * Math.PI / 180;
+    var at = baseAngle * Math.PI / 180;
+    var Ax = cx + R * Math.cos(a1), Ay = cy + R * Math.sin(a1);
+    var Bx = cx + R * Math.cos(a2), By = cy + R * Math.sin(a2);
+    var Tx = cx + tipR * Math.cos(at), Ty = cy + tipR * Math.sin(at);
+    var d = "M " + cx + " " + cy +
+            " L " + Ax.toFixed(2) + " " + Ay.toFixed(2) +
+            " Q " + Tx.toFixed(2) + " " + Ty.toFixed(2) + " " + Bx.toFixed(2) + " " + By.toFixed(2) +
+            " Z";
+    var path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('class', 'blade');
+    path.style.opacity = (0.86 + (i % 2) * 0.14).toFixed(2);
+    bladesGroup.appendChild(path);
+  }
+
+  // ---- Trigger opening animation on load ----
+  var hero = document.querySelector('.hero');
+  window.addEventListener('load', function () {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        hero.classList.add('loaded');
+      });
+    });
+  });
+
+  // ---- Mouse parallax on the aperture (skipped for reduced motion) ----
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var scene = document.getElementById('apertureScene');
+  if (!reduceMotion && scene) {
+    var raf = null;
+    hero.addEventListener('mousemove', function (e) {
+      if (raf) return;
+      raf = requestAnimationFrame(function () {
+        var rect = hero.getBoundingClientRect();
+        var px = (e.clientX - rect.left) / rect.width - 0.5;
+        var py = (e.clientY - rect.top) / rect.height - 0.5;
+        scene.style.transform = 'rotate(' + (px * 6).toFixed(2) + 'deg) translate(' + (px * 10).toFixed(1) + 'px, ' + (py * 10).toFixed(1) + 'px)';
+        raf = null;
+      });
+    });
+    hero.addEventListener('mouseleave', function () {
+      scene.style.transform = '';
+    });
+  }
+
+  // ---- Scroll reveal ----
+  var revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(function (el) { io.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add('in-view'); });
+  }
+})();
+</script>
 
 </body>
 </html>
